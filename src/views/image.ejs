@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#09090b">
+    <meta property="og:image" content="<%= imageUrl %>">
+    <meta property="og:title" content="ImgFast - Resim">
+    <meta property="og:description" content="<%= views %> görüntülenme">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="<%= imageUrl %>">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>ImgFast - Resim · <%= views %> görüntülenme</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #09090b;
+            color: #f4f4f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .main-wrapper {
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        /* Image */
+        .image-container {
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        .image-container img {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+            background: #000;
+        }
+        .image-container.blurred img {
+            filter: blur(30px);
+            transition: filter 0.3s;
+        }
+        .image-container.blurred .nsfw-overlay {
+            display: flex;
+        }
+        .nsfw-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 2;
+        }
+        .nsfw-overlay span {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .nsfw-overlay button {
+            padding: 10px 24px;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Info */
+        .info-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 12px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+        }
+        .file-type-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .nsfw-toggle {
+            margin-left: auto;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #27272d;
+            background: transparent;
+            color: #a1a1aa;
+        }
+        .nsfw-toggle.active {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border-color: #ef4444;
+        }
+
+        /* Description */
+        .description-box {
+            margin-top: 12px;
+            padding: 14px 16px;
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            line-height: 1.6;
+        }
+        .description-box strong {
+            color: #f4f4f9;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* EXIF */
+        .exif-box {
+            margin-top: 12px;
+            padding: 14px 16px;
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 12px;
+        }
+        .exif-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: #f4f4f9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .exif-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .exif-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            padding: 4px 0;
+            border-bottom: 1px solid #1a1a20;
+        }
+        .exif-label { color: #71717a; }
+        .exif-value { color: #a1a1aa; }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.7; }
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid #27272d; color: #a1a1aa; }
+        .btn-danger { background: transparent; border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+
+        /* Comments */
+        .comments-section {
+            margin-top: 20px;
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .comments-section h3 {
+            font-size: 1rem;
+            margin-bottom: 16px;
+            color: #f4f4f9;
+        }
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .comment-form input,
+        .comment-form textarea {
+            padding: 10px 14px;
+            background: #1a1a20;
+            border: 1px solid #27272d;
+            border-radius: 8px;
+            color: #f4f4f9;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            resize: vertical;
+        }
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            border-color: #6366f1;
+        }
+        .comment-form textarea { min-height: 60px; }
+        .comment-form button {
+            align-self: flex-end;
+            padding: 8px 20px;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .comment-list { display: flex; flex-direction: column; gap: 12px; }
+        .comment-item {
+            padding: 12px;
+            background: #1a1a20;
+            border-radius: 10px;
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+        }
+        .comment-author { color: #6366f1; font-weight: 600; }
+        .comment-date { color: #71717a; }
+        .comment-text { font-size: 0.85rem; color: #c9d1d9; line-height: 1.5; }
+        .no-comments { text-align: center; color: #71717a; padding: 20px; font-size: 0.85rem; }
+
+        footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #484f58;
+        }
+        footer a { color: #6366f1; text-decoration: none; }
+
+        @media (max-width: 500px) {
+            .exif-grid { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-wrapper">
+        
+        <!-- Image -->
+        <div class="image-container <%= isNsfw ? 'blurred' : '' %>" id="imageContainer" style="position:relative;">
+            <img src="<%= imageUrl %>" alt="ImgFast Resim">
+            <% if (isNsfw) { %>
+            <div class="nsfw-overlay">
+                <span>⚠️ +18 Yetişkin İçerik</span>
+                <button onclick="showImage()">Görüntülemek İçin Tıkla</button>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Info -->
+        <div class="info-section">
+            <div class="info-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                <%= views %> görüntülenme
+            </div>
+            <% if (fileBadge) { %>
+            <span class="file-type-badge" style="background:<%= fileBadge.color %>"><%= fileBadge.label %></span>
+            <% } %>
+            <button class="nsfw-toggle <%= isNsfw ? 'active' : '' %>" id="nsfwToggle" onclick="toggleNsfw()">
+                +18
+            </button>
+        </div>
+
+        <!-- Description -->
+        <% if (description) { %>
+        <div class="description-box">
+            <strong>📝 Açıklama</strong>
+            <%= description %>
+        </div>
+        <% } %>
+
+        <!-- EXIF -->
+        <% if (exifData) { %>
+        <div class="exif-box">
+            <strong>📷 EXIF Bilgileri</strong>
+            <div class="exif-grid">
+                <div class="exif-item"><span class="exif-label">Genişlik</span><span class="exif-value"><%= exifData.width %>px</span></div>
+                <div class="exif-item"><span class="exif-label">Yükseklik</span><span class="exif-value"><%= exifData.height %>px</span></div>
+                <div class="exif-item"><span class="exif-label">Format</span><span class="exif-value"><%= exifData.format %></span></div>
+                <div class="exif-item"><span class="exif-label">Renk Uzayı</span><span class="exif-value"><%= exifData.colorSpace %></span></div>
+                <div class="exif-item"><span class="exif-label">Kanal</span><span class="exif-value"><%= exifData.channels %></span></div>
+                <div class="exif-item"><span class="exif-label">Oryantasyon</span><span class="exif-value"><%= exifData.orientation %></span></div>
+                <div class="exif-item"><span class="exif-label">Alpha Kanalı</span><span class="exif-value"><%= exifData.hasAlpha ? 'Var' : 'Yok' %></span></div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="<%= imageUrl %>" download class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                İndir
+            </a>
+            <a href="<%= siteUrl %>" class="btn btn-outline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Yeni Yükle
+            </a>
+            <a href="<%= deleteUrl %>" class="btn btn-danger" onclick="return confirm('Resmi silmek istediğinize emin misiniz?')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                Sil
+            </a>
+        </div>
+
+        <!-- Comments -->
+        <div class="comments-section">
+            <h3>💬 Yorumlar (<span id="commentCount"><%= comments.length %></span>)</h3>
+            
+            <div class="comment-form">
+                <input type="text" id="commentAuthor" placeholder="Adınız" maxlength="30">
+                <textarea id="commentText" placeholder="Yorumunuz..." maxlength="500"></textarea>
+                <button onclick="addComment()">Yorum Yap</button>
+            </div>
+
+            <div class="comment-list" id="commentList">
+                <% if (comments.length === 0) { %>
+                <p class="no-comments" id="noComments">Henüz yorum yapılmamış. İlk yorumu sen yap!</p>
+                <% } %>
+                <% comments.forEach(function(c) { %>
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-author"><%= c.author %></span>
+                        <span class="comment-date"><%= new Date(c.date).toLocaleDateString('tr-TR') %></span>
+                    </div>
+                    <p class="comment-text"><%= c.text %></p>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <footer>
+            <a href="<%= siteUrl %>">ImgFast</a> ile yüklendi
+        </footer>
+
+    </main>
+
+    <script>
+        var currentKey = '<%= key %>';
+        var isNsfw = <%= isNsfw ? 'true' : 'false' %>;
+
+        function showImage() {
+            document.getElementById('imageContainer').classList.remove('blurred');
+        }
+
+        function toggleNsfw() {
+            var btn = document.getElementById('nsfwToggle');
+            isNsfw = !isNsfw;
+            btn.classList.toggle('active', isNsfw);
+            fetch('/api/nsfw/' + currentKey, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nsfw: isNsfw })
+            });
+            if (isNsfw) {
+                document.getElementById('imageContainer').classList.add('blurred');
+            } else {
+                document.getElementById('imageContainer').classList.remove('blurred');
+            }
+        }
+
+        async function addComment() {
+            var author = document.getElementById('commentAuthor').value.trim();
+            var text = document.getElementById('commentText').value.trim();
+
+            if (!author || !text) {
+                alert('Lütfen adınızı ve yorumunuzu yazın.');
+                return;
+            }
+
+            try {
+                var res = await fetch('/api/comment/' + currentKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author: author, text: text })
+                });
+                var data = await res.json();
+                if (data.success) {
+                    var noComments = document.getElementById('noComments');
+                    if (noComments) noComments.remove();
+
+                    var item = document.createElement('div');
+                    item.className = 'comment-item';
+                    item.innerHTML = '<div class="comment-header"><span class="comment-author">' + data.comment.author + '</span><span class="comment-date">Az önce</span></div><p class="comment-text">' + data.comment.text + '</p>';
+                    document.getElementById('commentList').prepend(item);
+
+                    document.getElementById('commentAuthor').value = '';
+                    document.getElementById('commentText').value = '';
+
+                    var count = document.getElementById('commentCount');
+                    count.textContent = parseInt(count.textContent) + 1;
+                }
+            } catch (err) {
+                alert('Yorum eklenemedi.');
+            }
+        }
+    </script>
+
+</body>
+</html>
