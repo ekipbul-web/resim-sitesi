@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#09090b">
+    <title>ImgFast - Admin Girişi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #09090b;
+            color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .login-card {
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 18px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .login-card h2 {
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #6366f1;
+        }
+        .login-card p {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #71717a;
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #a1a1aa;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #1a1a20;
+            border: 1px solid #27272d;
+            border-radius: 10px;
+            color: #f4f4f9;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #6366f1;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .error {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #71717a;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #6366f1; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>🔐 Admin Paneli</h2>
+        <p>ImgFast yönetim paneline giriş</p>
+
+        <% if (error) { %>
+        <div class="error"><%= error %></div>
+        <% } %>
+
+        <form method="POST" action="/admin/login">
+            <div class="form-group">
+                <label>Şifre</label>
+                <input type="password" name="password" placeholder="Admin şifresini girin" required autofocus>
+            </div>
+            <button type="submit" class="btn">Giriş Yap</button>
+        </form>
+
+        <a href="<%= siteUrl %>" class="back-link">← Siteye Dön</a>
+    </div>
+</body>
+</html>
