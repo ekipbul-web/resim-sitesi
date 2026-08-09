@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#09090b">
+    <link rel="icon" type="image/png" href="/logo.png">
+    <title>ImgFast - <%= success ? 'Silindi' : 'Hata' %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: #09090b;
+            color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .card {
+            background: #121216;
+            border: 1px solid #27272d;
+            border-radius: 18px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+        }
+        .success .icon {
+            background: rgba(34,197,94,0.1);
+            color: #22c55e;
+        }
+        .error .icon {
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        p {
+            color: #a1a1aa;
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #6366f1;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: opacity 0.2s;
+        }
+        a:active {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="<%= success ? 'success' : 'error' %>">
+    <div class="card">
+        <div class="icon">
+            <%= success ? '✓' : '✕' %>
+        </div>
+        <h2><%= message %></h2>
+        <% if (success) { %>
+            <p>Dosya Cloudflare R2 sunucularından kalıcı olarak kaldırıldı.</p>
+        <% } else { %>
+            <p>Bir şeyler ters gitti. Lütfen tekrar deneyin veya ana sayfaya dönün.</p>
+        <% } %>
+        <a href="/">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Ana Sayfaya Dön
+        </a>
+    </div>
+</body>
+</html>
